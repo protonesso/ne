@@ -599,10 +599,7 @@ install_package() {
 	fi
 
 	if [ "$DEPENDS" = "no" ]; then
-		if [ -n "$(dpkg -I $pkg | grep 'Depends:' | sed -e 's/Depends://g')" ]; then
-			rmdep="$(dpkg -I $pkg | grep ' Depends: ' | sed -e 's/ Depends: //g' | sed -e 's/, /,/g')"
-			DEPENDSFLAGS="--ignore-depends=$rmdep"
-		fi
+		DEPENDSFLAGS="--force-depends"
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
@@ -686,10 +683,7 @@ emerge_package() {
 	fi
 
 	if [ "$DEPENDS" = "no" ]; then
-		if [ -n "$(dpkg -I $pkg | grep 'Depends:' | sed -e 's/Depends://g')" ]; then
-			rmdep="$(dpkg -I $pkg | grep ' Depends: ' | sed -e 's/ Depends: //g' | sed -e 's/, /,/g')"
-			DEPENDSFLAGS="--ignore-depends=$rmdep"
-		fi
+		DEPENDSFLAGS="--force-depends"
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
