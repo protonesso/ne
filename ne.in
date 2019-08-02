@@ -411,7 +411,7 @@ create_package() {
 		mkdir -p DEBIAN
 		echo "Package: $name" >> DEBIAN/control
 		echo "Version: ${version}-${release}" >> DEBIAN/control
-		echo "Architecture: musl-linux-$BARCH" >> DEBIAN/control
+		echo "Architecture: $BARCH" >> DEBIAN/control
 		echo "Maintainer: $maintainer" >> DEBIAN/control
 		echo "Section: $section" >> DEBIAN/control
 
@@ -555,7 +555,7 @@ database_setup() {
 	fi
 
 	if [ ! -f "${ROOTDIR}/var/lib/dpkg/arch" ]; then
-		dpkg "$ROOTFLAGS" --add-architecture musl-linux-$BARCH
+		dpkg "$ROOTFLAGS" --add-architecture $BARCH
 	fi
 }
 
