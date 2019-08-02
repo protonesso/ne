@@ -555,7 +555,7 @@ database_setup() {
 	fi
 
 	if [ ! -f "${ROOTDIR}/var/lib/dpkg/arch" ]; then
-		dpkg "$ROOTFLAGS" --add-architecture $BARCH
+		dpkg "$ROOTFLAGS" --add-architecture musl-linux-$BARCH
 	fi
 }
 
