@@ -59,7 +59,7 @@ find_portver() {
 
 find_instver() {
 	if [ -n "$ROOTDIR" ]; then
-		ROOTFLAGS="--root $ROOTDIR"
+		ROOTFLAGS="--root=$ROOTDIR"
 	fi
 
 	local pkg="$1"
@@ -606,12 +606,12 @@ install_package() {
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
-		ROOTFLAGS="--root $ROOTDIR"
+		ROOTFLAGS="--root=$ROOTDIR"
 	fi
 
 	database_setup
 
-	dpkgopts="$FORCEFLAGS $CONFLICTSFLAGS $DEPENDSFLAGS $ROOTFLAGS -i"
+	dpkgopts="$ROOTFLAGS $FORCEFLAGS $CONFLICTSFLAGS $DEPENDSFLAGS -i"
 
 	if [ -n "$(dpkg $ROOTFLAGS -s $apkg 2>/dev/null | grep 'Package:' | awk '{print $2}')" ]; then
 		if [ "$NEEDED" = "yes" ]; then
@@ -633,7 +633,7 @@ remove_package() {
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
-		ROOTFLAGS="--root $ROOTDIR"
+		ROOTFLAGS="--root=$ROOTDIR"
 	fi
 
 	if [ -z "$pkg" ]; then
@@ -649,9 +649,9 @@ remove_package() {
 	fi
 
 	if [ "$purge" = "yes" ]; then
-		dpkgopts="$FORCEFLAGS $ROOTFLAGS -P"
+		dpkgopts="$ROOTFLAGS $FORCEFLAGS -P"
 	else
-		dpkgopts="$FORCEFLAGS $ROOTFLAGS -r"
+		dpkgopts="$ROOTFLAGS $FORCEFLAGS -r"
 	fi
 
 	dpkg $dpkgopts "$pkg"
@@ -693,7 +693,7 @@ emerge_package() {
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
-		ROOTFLAGS="--root $ROOTDIR"
+		ROOTFLAGS="--root=$ROOTDIR"
 	fi
 
 	pushd "$(find_portdir $pkg)"
