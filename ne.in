@@ -103,7 +103,7 @@ source_recipe() {
 	replaces="$(grep "^# Replaces[[:blank:]]*:" "$MYPORT" | sed 's/^# Replaces[[:blank:]]*:[[:blank:]]*//' | tr ' ' ' ' | awk '!a[$0]++' | sed -e 's/ /, /g')"
 	summary="$(grep "^# Description[[:blank:]]*:" "$MYPORT" | sed 's/^# Description[[:blank:]]*:[[:blank:]]*//' | tr ' ' ' ' | awk '!a[$0]++')"
 	section="$(grep "^# Section[[:blank:]]*:" "$MYPORT" | sed 's/^# Section[[:blank:]]*:[[:blank:]]*//' | tr ' ' ' ' | awk '!a[$0]++' | sed -e 's/ /, /g')"
-	priority="$(grep "^# Section[[:blank:]]*:" "$MYPORT" | sed 's/^# Section[[:blank:]]*:[[:blank:]]*//' | tr ' ' ' ' | awk '!a[$0]++' | sed -e 's/ /, /g')"
+	priority="$(grep "^# Priority[[:blank:]]*:" "$MYPORT" | sed 's/^# Priority[[:blank:]]*:[[:blank:]]*//' | tr ' ' ' ' | awk '!a[$0]++' | sed -e 's/ /, /g')"
 	maintainer="suzu <root@localhost>"
 
 	if [ "$USEBOOTSTRAP" = "yes" ]; then
@@ -411,7 +411,7 @@ create_package() {
 		mkdir -p DEBIAN
 		echo "Package: $name" >> DEBIAN/control
 		echo "Version: ${version}-${release}" >> DEBIAN/control
-		echo "Architecture: $BARCH" >> DEBIAN/control
+		echo "Architecture: musl-linux-$BARCH" >> DEBIAN/control
 		echo "Maintainer: $maintainer" >> DEBIAN/control
 		echo "Section: $section" >> DEBIAN/control
 
