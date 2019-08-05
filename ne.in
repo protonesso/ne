@@ -300,6 +300,9 @@ unpack_source() {
 						cp $LOCAL_FILENAME "$SRC" || die "Failed to copy $FILENAME to the sources directory"
 						;;
 				esac
+			else
+				msg "Copying $FILENAME to the sources directory"
+				cp $LOCAL_FILENAME "$SRC" || die "Failed to copy $FILENAME to the sources directory"
 			fi
 			nxt=
 		done
@@ -489,7 +492,7 @@ build_package() {
 		SRCDEST="$TOPDIR"
 	fi
 
-	TARGET="$PKGDEST/${name}_${version}-${release}_${BARCH}.deb"
+	TARGET="$PKGDEST/${name}_${version}-${release}_musl-linux-${BARCH}.deb"
 
 	if [ "$FORCE" = "yes" ]; then
 		rm -rf "$TARGET"
