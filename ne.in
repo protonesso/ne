@@ -81,7 +81,7 @@ source_config() {
 }
 
 source_recipe() {
-	unset name version release options backup source noextract triggers
+	unset name version release options backup source noextract
 
 	if [ -f "$TOPDIR/KagamiBuild" ]; then
 		MYPORT="$TOPDIR/KagamiBuild"
@@ -453,7 +453,7 @@ create_package() {
 		fi
 
 		if [ -f "$TOPDIR/trigger" ]; then
-			cp "$TOPDIR/trigger" DEBIAN/triggers
+			cp "$TOPDIR/trigger" DEBIAN/${name}.triggers
 		fi
 
 		if [ -n "$backup" ]; then
