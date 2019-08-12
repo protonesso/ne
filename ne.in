@@ -225,7 +225,7 @@ download_file() {
 
 	LOCAL_FILENAME=`get_filename $url`
 	LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
-	cmd="-L -o $LOCAL_FILENAME_PARTIAL $CURLOPTS"
+	cmd="-f --retry 3 --retry-delay 3 -L -o $LOCAL_FILENAME_PARTIAL $CURLOPTS"
 	resumecmd="-C -"
 	fullcmd="curl $cmd"
 	RESUME="no"
@@ -711,7 +711,10 @@ emerge_package() {
 			if [ -n "$depends" ]; then
 				for mydepends in ${xdepends[@]}; do
 					if [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
-						(set -e; emerge_package $mydepends)
+						{
+							set -e
+							emerge_package $mydepends
+						}
 						if [ $? = 0 ]; then
 							HAS_SUCCESS="yes"
 						fi
@@ -770,7 +773,10 @@ system_upgrade() {
 	done
 
 	for updt in $(cat /tmp/2update); do
-		(set -e; emerge_package $updt)
+		{
+			set -e
+			emerge_package $updt
+		}
 		if [ $? = 0 ]; then
 			HAS_SUCCESS="yes"
 		fi
