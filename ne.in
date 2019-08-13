@@ -594,7 +594,7 @@ install_package() {
 	apkg="$(dpkg -I $pkg | grep 'Package:' | awk '{print $2}')"
 
 	if [ "$FORCE" = "yes" ]; then
-		FORCEFLAGS="--force"
+		FORCEFLAGS="--force-overwrite"
 	fi
 
 	if [ "$CONFLICTS" = "no" ]; then
@@ -628,8 +628,12 @@ remove_package() {
 	local HAS_SUCCESS="no"
 	local pkg="$1"
 
-	if [ "$FORCE" = "yes" ]; then
-		FORCEFLAGS="--force"
+	if [ "$CONFLICTS" = "no" ]; then
+		CONFLICTSFLAGS="--force-conflicts"
+	fi
+
+	if [ "$DEPENDS" = "no" ]; then
+		DEPENDSFLAGS="--force-depends"
 	fi
 
 	if [ -n "$ROOTDIR" ]; then
@@ -678,7 +682,7 @@ emerge_package() {
 	fi
 
 	if [ "$FORCE" = "yes" ]; then
-		FORCEFLAGS="--force"
+		FORCEFLAGS="--force-overwrite"
 	fi
 
 	if [ "$CONFLICTS" = "no" ]; then
