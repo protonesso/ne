@@ -720,7 +720,7 @@ emerge_package() {
 						fi
 						if [ "$HAS_SUCCESS" != "yes" ]; then
 							die "Failed to install dependencies"
-						elif [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
+						elif [ -z "$(cat /var/lib/dpkg/status | grep -oh 'Package: ${mydepends}' | awk '{print $2}')" ]; then
 							die "Failed to install dependencies"
 						fi
 					fi
