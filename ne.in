@@ -231,7 +231,7 @@ download_file() {
 	RESUME="no"
 
 	if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
-		warntwo "Partial download found, trying to resume"
+		warn "Partial download found, trying to resume"
 		RESUME="yes"
 		fullcmd="$fullcmd $resumecmd"
 	fi
@@ -711,14 +711,16 @@ emerge_package() {
 			if [ -n "$depends" ]; then
 				for mydepends in ${xdepends[@]}; do
 					if [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
-						{
+						(
 							set -e
 							emerge_package $mydepends
-						}
+						)
 						if [ $? = 0 ]; then
 							HAS_SUCCESS="yes"
 						fi
 						if [ "$HAS_SUCCESS" != "yes" ]; then
+							die "Failed to install dependencies"
+						elif [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
 							die "Failed to install dependencies"
 						fi
 					fi
@@ -773,15 +775,15 @@ system_upgrade() {
 	done
 
 	for updt in $(cat /tmp/2update); do
-		{
+		(
 			set -e
 			emerge_package $updt
-		}
+		)
 		if [ $? = 0 ]; then
 			HAS_SUCCESS="yes"
 		fi
 		if [ "$HAS_SUCCESS" != "yes" ]; then
-			die "Failed to update packages"
+			die "Failed to install dependencies"
 		fi
 	done
 }
