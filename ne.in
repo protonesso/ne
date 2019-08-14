@@ -724,7 +724,7 @@ emerge_package() {
 						fi
 						if [ "$HAS_SUCCESS" != "yes" ]; then
 							die "Failed to install dependencies"
-						elif [ -z "$(cat /var/lib/dpkg/status | grep -oh 'Package: ${mydepends}' | awk '{print $2}')" ]; then
+						elif [ "$(dpkg $ROOTFLAGS -s $mydepends | grep -oh 'installed')" != "installed" ]; then
 							die "Failed to install dependencies"
 						fi
 					fi
@@ -739,7 +739,7 @@ emerge_package() {
 				die "Package file wasn't found"
 			fi
 			install_package
-			if [ $? = 0 ]; then
+			if [ $? -eq 0 ]; then
 				HAS_SUCCESS="yes"
 			fi
 			if [ "$HAS_SUCCESS" != "yes" ]; then
@@ -783,7 +783,7 @@ system_upgrade() {
 			set -e
 			emerge_package $updt
 		)
-		if [ $? = 0 ]; then
+		if [ $? -eq 0 ]; then
 			HAS_SUCCESS="yes"
 		fi
 		if [ "$HAS_SUCCESS" != "yes" ]; then
