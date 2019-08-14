@@ -724,8 +724,6 @@ emerge_package() {
 						fi
 						if [ "$HAS_SUCCESS" != "yes" ]; then
 							die "Failed to install dependencies"
-						elif [ "$(dpkg $ROOTFLAGS -s $mydepends | grep -oh 'installed')" != "installed" ]; then
-							die "Failed to install dependencies"
 						fi
 					fi
 				done
