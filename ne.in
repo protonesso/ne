@@ -82,6 +82,7 @@ source_config() {
 
 source_recipe() {
 	unset name version release options backup source noextract
+	unset -f build
 
 	if [ -f "$TOPDIR/KagamiBuild" ]; then
 		MYPORT="$TOPDIR/KagamiBuild"
@@ -309,7 +310,21 @@ unpack_source() {
 	fi
 }
 
+setup_compiler() {
+	if [ -n "$CC" ]; then
+		MYCC="$CC"
+	else
+		MYCC="gcc"
+	fi
+	if [ -n "$CXX" ]; then
+		MYCXX="$CXX"
+	else
+		MYCXX="g++"
+	fi
+}
+
 compile_package() {
+	local MYCC MYCXX
 	local HAS_SUCCESS="no"
 
 	if [ "$OPT_MAKEFLAGS" != "0" ]; then
@@ -323,23 +338,32 @@ compile_package() {
 		if [ "$OPT_CCACHE" != "0" ]; then
 			if type ccache > /dev/null 2>&1; then
 				if [ -n "$CC" ]; then
-					export CC="ccache $CC"
+					MYCC="ccache $CC"
 				else
-					export CC="ccache gcc"
+					MYCC="ccache gcc"
 				fi
 				if [ -n "$CXX" ]; then
-					export CXX="ccache $CXX"
+					MYCXX="ccache $CXX"
 				else
-					export CXX="ccache g++"
+					MYCXX="ccache g++"
 				fi
+			else
+				setup_compiler
 			fi
+		else
+			setup_compiler
 		fi
 	fi
 
 	if type build > /dev/null 2>&1; then
 		msg "Compiling package"
 		pushd "$SRC"
-			(set -e; build)
+			(
+				set -e
+				export CC="$MYCC"
+				export CXX="$MYCXX"
+				build
+			)
 			if [ $? = 0 ]; then
 				HAS_SUCCESS="yes"
 			fi
