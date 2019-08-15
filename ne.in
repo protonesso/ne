@@ -310,6 +310,8 @@ unpack_source() {
 }
 
 compile_package() {
+	local HAS_SUCCESS="no"
+
 	if [ "$OPT_MAKEFLAGS" != "0" ]; then
 		export MAKEFLAGS="$MKOPTS"
 		export NINJA_OPTIONS="$MKOPTS"
@@ -337,7 +339,14 @@ compile_package() {
 	if type build > /dev/null 2>&1; then
 		msg "Compiling package"
 		pushd "$SRC"
-			build || die "Failed to compile package"
+			(set -e; build)
+			if [ $? = 0 ]; then
+				HAS_SUCCESS="yes"
+			fi
+
+			if [ "$HAS_SUCCESS" != "yes" ]; then
+				die "Failed to compile package: $name"
+			fi
 		popd
 	fi
 
@@ -646,8 +655,8 @@ remove_package() {
 }
 
 emerge_package() {
-	local pkg="$1"
 	local HAS_SUCCESS="no"
+	local pkg="$1"
 
 	if [ -z "$REPOS" ]; then
 		die "You haven't specified repositories"
@@ -689,20 +698,19 @@ emerge_package() {
 
 		if [ "$DEPENDS" != "no" ]; then
 			if [ -n "$depends" ]; then
-				for mydepends in ${xdepends[@]}; do
-					if [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
-						(
-							set -e
+				(
+					for mydepends in ${xdepends[@]}; do
+						if [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
 							emerge_package $mydepends
-						)
-						if [ $? = 0 ]; then
-							HAS_SUCCESS="yes"
 						fi
-						if [ "$HAS_SUCCESS" != "yes" ]; then
-							die "Failed to install dependencies"
-						fi
-					fi
-				done
+					done
+				)
+				if [ $? = 0 ]; then
+					HAS_SUCCESS="yes"
+				fi
+				if [ "$HAS_SUCCESS" != "yes" ]; then
+					exit 1
+				fi
 			fi
 		fi
 
@@ -713,14 +721,7 @@ emerge_package() {
 				die "Package file wasn't found"
 			fi
 			install_package
-			if [ $? -eq 0 ]; then
-				HAS_SUCCESS="yes"
-			fi
-			if [ "$HAS_SUCCESS" != "yes" ]; then
-				die "Failed to emerge package"
-			fi
 		fi
-
 	popd
 }
 
@@ -752,9 +753,17 @@ system_upgrade() {
 		echo " $updt"
 	done
 
-	for updt in $(cat /tmp/2update); do
-		emerge_package $updt || die "Failed to update package"
-	done
+	(
+		for updt in $(cat /tmp/2update); do
+			emerge_package $updt
+		done
+	)
+	if [ $? = 0 ]; then
+		HAS_SUCCESS="yes"
+	fi
+	if [ "$HAS_SUCCESS" != "yes" ]; then
+		exit 1
+	fi
 }
 
 yui() {
