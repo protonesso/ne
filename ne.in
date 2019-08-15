@@ -310,8 +310,6 @@ unpack_source() {
 }
 
 compile_package() {
-	local BUILD_SUCCESS="no"
-
 	if [ "$OPT_MAKEFLAGS" != "0" ]; then
 		export MAKEFLAGS="$MKOPTS"
 		export NINJA_OPTIONS="$MKOPTS"
@@ -339,14 +337,7 @@ compile_package() {
 	if type build > /dev/null 2>&1; then
 		msg "Compiling package"
 		pushd "$SRC"
-			(set -e; build)
-			if [ $? = 0 ]; then
-				BUILD_SUCCESS="yes"
-			fi
-
-			if [ "$BUILD_SUCCESS" != "yes" ]; then
-				die "Failed to compile package"
-			fi
+			build || die "Failed to compile package"
 		popd
 	fi
 
@@ -563,17 +554,9 @@ database_setup() {
 }
 
 install_package_min() {
-	local HAS_SUCCESS="no"
-
 	msg "Installing package: '${apkg}'"
 
-	dpkg $dpkgopts "$pkg"
-	if [ $? = 0 ]; then
-		HAS_SUCCESS="yes"
-	fi
-	if [ "$HAS_SUCCESS" != "yes" ]; then
-		die "Failed to install package"
-	fi
+	dpkg $dpkgopts "$pkg" || die "Failed to install package"
 
 	msg "Package was successfuly installed"
 }
@@ -625,7 +608,6 @@ install_package() {
 }
 
 remove_package() {
-	local HAS_SUCCESS="no"
 	local pkg="$1"
 
 	if [ "$CONFLICTS" = "no" ]; then
@@ -658,13 +640,7 @@ remove_package() {
 		dpkgopts="$ROOTFLAGS $FORCEFLAGS -r"
 	fi
 
-	dpkg $dpkgopts "$pkg"
-	if [ $? = 0 ]; then
-		HAS_SUCCESS="yes"
-	fi
-	if [ "$HAS_SUCCESS" != "yes" ]; then
-		die "Failed to remove package"
-	fi
+	dpkg $dpkgopts "$pkg" || die "Failed to remove package"
 
 	msg "Package was successfuly removed"
 }
@@ -777,16 +753,7 @@ system_upgrade() {
 	done
 
 	for updt in $(cat /tmp/2update); do
-		(
-			set -e
-			emerge_package $updt
-		)
-		if [ $? -eq 0 ]; then
-			HAS_SUCCESS="yes"
-		fi
-		if [ "$HAS_SUCCESS" != "yes" ]; then
-			die "Failed to install dependencies"
-		fi
+		emerge_package $updt || die "Failed to update package"
 	done
 }
 
