@@ -26,6 +26,14 @@ check_root() {
 	fi
 }
 
+is_installed() {
+	local pkg="$1"
+
+	if [ -n "$(cat $ROOTDIR/var/lib/dpkg/status | grep -oh "$pkg")" ]; then
+		echo "yes"
+	fi
+}
+
 find_portdir() {
 	local pkg="$1"
 
@@ -629,7 +637,7 @@ install_package() {
 
 	dpkgopts="$ROOTFLAGS $FORCEFLAGS $CONFLICTSFLAGS $DEPENDSFLAGS -i"
 
-	if [ -n "$(dpkg $ROOTFLAGS -s $apkg 2>/dev/null | grep 'Package:' | awk '{print $2}')" ]; then
+	if [ "$(is_installed $apkg)" = "yes" ]; then
 		if [ "$NEEDED" = "yes" ]; then
 			warn "$apkg: package is already installed"
 		else
@@ -659,7 +667,7 @@ remove_package() {
 		die "You haven't specified packge name"
 	fi
 
-	if [ -z "$(dpkg $ROOTFLAGS -s $pkg 2>/dev/null | grep 'Package:' | awk '{print $2}')" ]; then
+	if [ "$(is_installed $pkg)" != "yes" ]; then
 		die "Your package is not installed"
 	fi
 
@@ -713,7 +721,7 @@ emerge_package() {
 		if [ "$CONFLICTS" != "no" ]; then
 			if [ -n "$conflicts" ]; then
 				for myconflicts in ${xconflicts[@]}; do
-					if [ -n "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
+					if [ "$(is_installed $myconflicts)" = "yes" ]; then
 						die "Your package is conflicting with $myconflicts"
 					fi
 				done
@@ -724,7 +732,7 @@ emerge_package() {
 			if [ -n "$depends" ]; then
 				(
 					for mydepends in ${xdepends[@]}; do
-						if [ -z "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
+						if [ "$(is_installed $mydepends)" != "yes" ]; then
 							emerge_package $mydepends
 						fi
 					done
