@@ -681,6 +681,7 @@ remove_package() {
 		dpkgopts="$ROOTFLAGS $FORCEFLAGS -r"
 	fi
 
+	msg "Removing package: '${pkg}'"
 	dpkg $dpkgopts "$pkg" || die "Failed to remove package"
 
 	msg "Package was successfuly removed"
