@@ -322,15 +322,15 @@ compile_package() {
 	if [ "$USE_BOOTSTRAP" != "yes" ]; then
 		if [ "$OPT_CCACHE" != "0" ]; then
 			if type ccache > /dev/null 2>&1; then
-				if [ -z "$CC" ]; then
-					export CC="ccache gcc"
-				else
+				if [ -n "$CC" ]; then
 					export CC="ccache $CC"
-				fi
-				if [ -z "$CXX" ]; then
-					export CXX="ccache g++"
 				else
+					export CC="ccache gcc"
+				fi
+				if [ -n "$CXX" ]; then
 					export CXX="ccache $CXX"
+				else
+					export CXX="ccache g++"
 				fi
 			fi
 		fi
@@ -689,7 +689,7 @@ emerge_package() {
 		if [ "$CONFLICTS" != "no" ]; then
 			if [ -n "$conflicts" ]; then
 				for myconflicts in ${xconflicts[@]}; do
-					if [ -n "$(dpkg $ROOTFLAGS -p $myconflicts | grep 'Package:' | awk '{print $2}')" ]; then
+					if [ -n "$(dpkg $ROOTFLAGS -s $mydepends | grep 'Package:' | awk '{print $2}')" ]; then
 						die "Your package is conflicting with $myconflicts"
 					fi
 				done
