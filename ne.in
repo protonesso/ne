@@ -29,7 +29,11 @@ check_root() {
 is_installed() {
 	local pkg="$1"
 
-	if [ -n "$(cat $ROOTDIR/var/lib/dpkg/status | grep -oh "$pkg")" ]; then
+	if [ -n "$ROOTDIR" ]; then
+		ROOTFLAGS="--root=$ROOTDIR"
+	fi
+
+	if [ -n "$(dpkg $ROOTFLAGS -s "$pkg" | grep -oh 'install ok installed')" ]; then
 		echo "yes"
 	fi
 }
