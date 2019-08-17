@@ -489,7 +489,7 @@ create_package() {
 		fi
 
 		if [ -f "$TOPDIR/trigger" ]; then
-			cp "$TOPDIR/trigger" DEBIAN/${name}.triggers
+			cp "$TOPDIR/trigger" DEBIAN/triggers
 		fi
 
 		if [ -n "$backup" ]; then
