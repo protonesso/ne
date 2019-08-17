@@ -579,6 +579,10 @@ build_package() {
 }
 
 database_setup() {
+	if [ -n "$ROOTDIR" ]; then
+		ROOTFLAGS="--root=$ROOTDIR"
+	fi
+
 	for dirs in /var/lib/dpkg/info /var/lib/dpkg/updates /var/lib/dpkg/triggers; do
 		if [ ! -d "${ROOTDIR}${dirs}" ]; then
 			mkdir -p "${ROOTDIR}${dirs}"
@@ -594,7 +598,7 @@ database_setup() {
 	fi
 
 	if [ ! -f "${ROOTDIR}/var/lib/dpkg/arch" ]; then
-		dpkg "$ROOTFLAGS" --add-architecture musl-linux-$BARCH
+		dpkg $ROOTFLAGS --add-architecture musl-linux-$BARCH
 	fi
 }
 
