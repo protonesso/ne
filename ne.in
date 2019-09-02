@@ -44,6 +44,7 @@ find_portdir() {
 	for myrepos in ${REPOS[@]}; do
 		if [ -d "$myrepos/$pkg" ]; then
 			echo "$myrepos/$pkg"
+			break
 		fi
 	done
 }
@@ -402,7 +403,21 @@ compile_package() {
 
 		if [ "$OPT_LOCALES" = "0" ]; then
 			msg "Removing locales"
+
+			for a in ru hu lt jp; do
+				if [ -d "usr/share/locale/$a" ]; then
+					mv usr/share/locale/$a "$WORK"
+				fi
+			done 
+
 			rm -rf {,usr/}{,local/}{,share/}locale
+
+			mkdir -p usr/share/locale/
+			for a in ru hu lt jp; do
+				if [ -d "$WORK/$a" ]; then
+					mv "$WORK"/a usr/share/locale/$a
+				fi
+			done 
 		fi
 
 		if [ "$OPT_DOCS" = "0" ]; then
