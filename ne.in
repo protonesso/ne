@@ -405,19 +405,19 @@ compile_package() {
 			msg "Removing locales"
 
 			for a in ru hu lt jp; do
-				if [ -d "usr/share/locale/$a" ]; then
-					mv usr/share/locale/$a "$WORK"
+				if [ -d "$WORK/pkg/usr/share/locale/$a" ]; then
+					mv "$WORK"/pkg/usr/share/locale/$a "$WORK"/$a
 				fi
-			done 
+			done
 
 			rm -rf {,usr/}{,local/}{,share/}locale
 
 			mkdir -p usr/share/locale/
 			for a in ru hu lt jp; do
 				if [ -d "$WORK/$a" ]; then
-					mv "$WORK"/a usr/share/locale/$a
+					mv "$WORK"/$a "$WORK"/pkg/usr/share/locale/$a
 				fi
-			done 
+			done
 		fi
 
 		if [ "$OPT_DOCS" = "0" ]; then
