@@ -403,21 +403,7 @@ compile_package() {
 
 		if [ "$OPT_LOCALES" = "0" ]; then
 			msg "Removing locales"
-
-			for a in ru ja; do
-				if [ -d "$WORK/pkg/usr/share/locale/$a" ]; then
-					mv "$WORK"/pkg/usr/share/locale/$a "$WORK"/$a
-				fi
-			done
-
-			rm -rf {,usr/}{,local/}{,share/}locale
-
-			mkdir -p usr/share/locale/
-			for a in ru ja; do
-				if [ -d "$WORK/$a" ]; then
-					mv "$WORK"/$a "$WORK"/pkg/usr/share/locale/$a
-				fi
-			done
+			rm -rf {,usr/}{,local/}{,share/,lib/}locale
 		fi
 
 		if [ "$OPT_DOCS" = "0" ]; then
